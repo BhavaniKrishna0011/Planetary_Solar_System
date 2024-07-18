@@ -10,7 +10,7 @@ if not glfw.init():
     raise Exception("GLFW can't be initialized")
 
 # Create a windowed mode window and its OpenGL context
-window = glfw.create_window(800, 600, "Realistic Planetary Model of Solar System", None, None)
+window = glfw.create_window(1600, 1200, "Realistic Planetary Model of Solar System", None, None)
 if not window:
     glfw.terminate()
     raise Exception("GLFW window can't be created")
@@ -97,8 +97,10 @@ outer_radius = 8.0
 num_asteroids = 500
 asteroid_eccentricity = 0.05
 asteroid_inclination = math.radians(10)
+asteroid_base_speed = 0.003  # Adjust speed as needed
 
 asteroid_positions = generate_asteroid_positions(inner_radius, outer_radius, num_asteroids, asteroid_eccentricity, asteroid_inclination)
+asteroid_angles = [np.random.uniform(0, 2 * math.pi) for _ in range(num_asteroids)]
 
 
 # Main loop
@@ -110,10 +112,10 @@ while not glfw.window_should_close(window):
     # Set up the camera
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    gluPerspective(60, 800 / 600, 0.1, 100.0)
+    gluPerspective(45, 1600 / 1200, 0.1, 100.0)
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 15, 40, 0, 0, 0, 0, 1, 0)
+    gluLookAt(0, 10, 30, 0, 0, 0, 0, 1, 0)
     
     # Draw the Sun as a solid-colored sphere
     glPushMatrix()
@@ -140,15 +142,24 @@ while not glfw.window_should_close(window):
         angles[name] += speed
         if angles[name] >= 2 * math.pi:
             angles[name] = 0
-        
-        # Draw the asteroid belt
+    
+    # Draw and update the asteroid belt
     glColor3f(0.5, 0.5, 0.5)  # Grey color for asteroids
-    for (x, y, z) in asteroid_positions:
+    for i, (x, y, z) in enumerate(asteroid_positions):
+        angle = asteroid_angles[i]
+        radius = np.random.uniform(inner_radius, outer_radius)
+        x, y, z = get_orbit_position(radius, angle, asteroid_eccentricity, asteroid_inclination)
+        
         glPushMatrix()
         glTranslatef(x, y, z)
         glScalef(0.05, 0.05, 0.05)
         draw_textured_sphere(textures["mars"], 1.0, 16, 16)  # Using Mars texture for simplicity
         glPopMatrix()
+        
+        # Update the angle for the next frame
+        asteroid_angles[i] += asteroid_base_speed
+        if asteroid_angles[i] >= 2 * math.pi:
+            asteroid_angles[i] = 0
     
     # Swap front and back buffers
     glfw.swap_buffers(window)
