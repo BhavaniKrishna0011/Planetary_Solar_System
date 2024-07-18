@@ -63,15 +63,15 @@ def get_orbit_position(orbital_radius, angle, eccentricity, inclination):
 
 # Planet data: (name, scale, semi-major axis, texture, orbital speed, eccentricity, inclination)
 planets = [
-    ("Mercury", 0.2, 2, textures["mercury"], 0.04, 0.205, math.radians(7)),
-    ("Venus", 0.3, 3, textures["venus"], 0.03, 0.007, math.radians(3.4)),
-    ("Earth", 0.4, 4, textures["earth"], 0.02, 0.017, math.radians(0)),
-    ("Mars", 0.3, 5, textures["mars"], 0.01, 0.093, math.radians(1.85)),
-    ("Jupiter", 0.7, 6.5, textures["jupiter"], 0.008, 0.048, math.radians(1.3)),
-    ("Saturn", 0.6, 8, textures["saturn"], 0.007, 0.056, math.radians(2.49)),
-    ("Uranus", 0.5, 9.5, textures["uranus"], 0.006, 0.046, math.radians(0.77)),
-    ("Neptune", 0.5, 11, textures["neptune"], 0.005, 0.010, math.radians(1.77)),
-    ("Pluto", 0.1, 13, textures["pluto"], 0.004, 0.248, math.radians(17.16))
+    ("Mercury", 0.2, 2, textures["mercury"], 0.06, 0.205, math.radians(7)),
+    ("Venus", 0.3, 3, textures["venus"], 0.045, 0.007, math.radians(3.4)),
+    ("Earth", 0.4, 4, textures["earth"], 0.03, 0.017, math.radians(0)),
+    ("Mars", 0.3, 5, textures["mars"], 0.015, 0.093, math.radians(1.85)),
+    ("Jupiter", 0.7, 6.5, textures["jupiter"], 0.012, 0.048, math.radians(1.3)),
+    ("Saturn", 0.6, 8, textures["saturn"], 0.0105, 0.056, math.radians(2.49)),
+    ("Uranus", 0.5, 9.5, textures["uranus"], 0.009, 0.046, math.radians(0.77)),
+    ("Neptune", 0.5, 11, textures["neptune"], 0.0075, 0.010, math.radians(1.77)),
+    ("Pluto", 0.1, 13, textures["pluto"], 0.006, 0.248, math.radians(17.16))
 ]
 
 sun_texture = textures["sun"]
@@ -120,6 +120,18 @@ while not glfw.window_should_close(window):
     glLoadIdentity()
     gluLookAt(0, 10, 30, 0, 0, 0, 0, 1, 0)
     
+    # Draw distant stars as points or textured spheres
+    glColor3f(1.0, 1.0, 1.0)  # White color for stars
+    glPointSize(1.0)  # Adjust point size as needed
+    glBegin(GL_POINTS)
+    for _ in range(1000):  # Draw 1000 stars
+        x = np.random.uniform(-100, 100)
+        y = np.random.uniform(-100, 100)
+        z = np.random.uniform(-100, -10)  # Place stars far behind the planets
+        glVertex3f(x, y, z)
+    glEnd()
+    
+    # Draw the Sun and planets
     glPushMatrix()
     glBindTexture(GL_TEXTURE_2D, sun_texture)
     glColor3f(1.0, 1.0, 1.0)  # White color for the Sun
@@ -147,23 +159,8 @@ while not glfw.window_should_close(window):
         if angles[name] >= 2 * math.pi:
             angles[name] = 0
     
-    # Draw and update the asteroid belt
-    glColor3f(0.5, 0.5, 0.5)  # Grey color for asteroids
-    for i, (x, y, z) in enumerate(asteroid_positions):
-        angle = asteroid_angles[i]
-        radius = np.random.uniform(inner_radius, outer_radius)
-        x, y, z = get_orbit_position(radius, angle, asteroid_eccentricity, asteroid_inclination)
-        
-        glPushMatrix()
-        glTranslatef(x, y, z)
-        glScalef(0.05, 0.05, 0.05)
-        draw_textured_sphere(textures["mars"], 1.0, 16, 16)  # Using Mars texture for simplicity
-        glPopMatrix()
-        
-        # Update the angle for the next frame
-        asteroid_angles[i] += asteroid_base_speed
-        if asteroid_angles[i] >= 2 * math.pi:
-            asteroid_angles[i] = 0
+    # Draw and update the asteroid belt (if desired)
+    # Code for asteroid belt
     
     # Swap front and back buffers
     glfw.swap_buffers(window)
