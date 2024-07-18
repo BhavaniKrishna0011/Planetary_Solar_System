@@ -10,7 +10,7 @@ if not glfw.init():
     raise Exception("GLFW can't be initialized")
 
 # Create a windowed mode window and its OpenGL context
-window = glfw.create_window(1600, 1200, "Realistic Planetary Model of Solar System", None, None)
+window = glfw.create_window(1600, 1080, "Realistic Planetary Model of Solar System", None, None)
 if not window:
     glfw.terminate()
     raise Exception("GLFW window can't be created")
@@ -30,6 +30,7 @@ def load_texture(path):
 
 # Load textures
 textures = {
+    "sun" : load_texture("textures/sun.jpeg"),
     "mercury": load_texture("textures/mercury.jpeg"),
     "venus": load_texture("textures/venus.jpeg"),
     "earth": load_texture("textures/earth.jpeg"),
@@ -72,6 +73,8 @@ planets = [
     ("Neptune", 0.5, 11, textures["neptune"], 0.005, 0.010, math.radians(1.77)),
     ("Pluto", 0.1, 13, textures["pluto"], 0.004, 0.248, math.radians(17.16))
 ]
+
+sun_texture = textures["sun"]
 
 # Initialize OpenGL settings
 glEnable(GL_TEXTURE_2D)
@@ -117,10 +120,11 @@ while not glfw.window_should_close(window):
     glLoadIdentity()
     gluLookAt(0, 10, 30, 0, 0, 0, 0, 1, 0)
     
-    # Draw the Sun as a solid-colored sphere
     glPushMatrix()
-    glColor3f(1.0, 1.0, 0.0)  # Yellow color for the Sun
+    glBindTexture(GL_TEXTURE_2D, sun_texture)
+    glColor3f(1.0, 1.0, 1.0)  # White color for the Sun
     quadric = gluNewQuadric()
+    gluQuadricTexture(quadric, GL_TRUE)
     gluSphere(quadric, 1.0, 32, 32)
     gluDeleteQuadric(quadric)
     glPopMatrix()
