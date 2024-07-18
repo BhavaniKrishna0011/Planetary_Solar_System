@@ -81,21 +81,25 @@ glEnable(GL_LIGHT0)
 glLightfv(GL_LIGHT0, GL_POSITION, [0, 0, 0, 1])
 glLightfv(GL_LIGHT0, GL_DIFFUSE, [1, 1, 1, 1])
 
-# Function to generate random positions within a ring
-def generate_ring_positions(inner_radius, outer_radius, num_objects, eccentricity, inclination):
-    positions = []
-    for _ in range(num_objects):
-        angle = np.random.uniform(0, 2 * np.pi)
-        radius = np.random.uniform(inner_radius, outer_radius)
-        x, y, z = get_orbit_position(radius, angle, eccentricity, inclination)
-        positions.append((x, y, z))
-    return positions
+# Generate positions for asteroids in a ring with a given range, eccentricity, and inclination
+def generate_asteroid_positions(inner_radius, outer_radius, num_asteroids, eccentricity, inclination):
+    asteroid_positions = []
+    for _ in range(num_asteroids):
+        orbital_radius = np.random.uniform(inner_radius, outer_radius)
+        angle = np.random.uniform(0, 2 * math.pi)
+        x, y, z = get_orbit_position(orbital_radius, angle, eccentricity, inclination)
+        asteroid_positions.append((x, y, z))
+    return asteroid_positions
 
-# Generate positions for the Asteroid Belt
-asteroid_positions = generate_ring_positions(5.5, 6, 200, 0.05, math.radians(10))
+# Asteroid belt properties
+inner_radius = 7.0
+outer_radius = 8.0
+num_asteroids = 500
+asteroid_eccentricity = 0.05
+asteroid_inclination = math.radians(10)
 
-# Generate positions for the Kuiper Belt
-kuiper_positions = generate_ring_positions(14, 20, 300, 0.1, math.radians(20))
+asteroid_positions = generate_asteroid_positions(inner_radius, outer_radius, num_asteroids, asteroid_eccentricity, asteroid_inclination)
+
 
 # Main loop
 angles = {planet[0]: 0 for planet in planets}
@@ -109,7 +113,7 @@ while not glfw.window_should_close(window):
     gluPerspective(60, 800 / 600, 0.1, 100.0)
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 20, 40, 0, 0, 0, 0, 1, 0)
+    gluLookAt(0, 15, 40, 0, 0, 0, 0, 1, 0)
     
     # Draw the Sun as a solid-colored sphere
     glPushMatrix()
@@ -136,6 +140,15 @@ while not glfw.window_should_close(window):
         angles[name] += speed
         if angles[name] >= 2 * math.pi:
             angles[name] = 0
+        
+        # Draw the asteroid belt
+    glColor3f(0.5, 0.5, 0.5)  # Grey color for asteroids
+    for (x, y, z) in asteroid_positions:
+        glPushMatrix()
+        glTranslatef(x, y, z)
+        glScalef(0.05, 0.05, 0.05)
+        draw_textured_sphere(textures["mars"], 1.0, 16, 16)  # Using Mars texture for simplicity
+        glPopMatrix()
     
     # Swap front and back buffers
     glfw.swap_buffers(window)
