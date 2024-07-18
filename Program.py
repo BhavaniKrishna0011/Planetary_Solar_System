@@ -110,6 +110,7 @@ asteroid_angles = [np.random.uniform(0, 2 * math.pi) for _ in range(num_asteroid
 angles = {planet[0]: 0 for planet in planets}
 while not glfw.window_should_close(window):
     # Clear the screen
+    glClearColor(0.0,0.0,0.0,1.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     
     # Set up the camera
@@ -122,12 +123,12 @@ while not glfw.window_should_close(window):
     
     # Draw distant stars as points or textured spheres
     glColor3f(1.0, 1.0, 1.0)  # White color for stars
-    glPointSize(1.0)  # Adjust point size as needed
+    glPointSize(2.0)  # Adjust point size as needed
     glBegin(GL_POINTS)
     for _ in range(1000):  # Draw 1000 stars
         x = np.random.uniform(-100, 100)
         y = np.random.uniform(-100, 100)
-        z = np.random.uniform(-100, -10)  # Place stars far behind the planets
+        z = np.random.uniform(-150, -50)  # Place stars far behind the planets
         glVertex3f(x, y, z)
     glEnd()
     
